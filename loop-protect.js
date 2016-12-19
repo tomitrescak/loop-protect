@@ -402,7 +402,7 @@ var loopProtect = (function () {
       line.time = now;
       line.hit = 0;
       line.last = 0;
-      line.expiration = 100;
+      line.expiration = 500;
     }
 
     line.hit++;
