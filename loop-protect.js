@@ -19,6 +19,8 @@ var loopProtect = (function () {
   // used in the loop detection
   loopProtect.counters = {};
 
+  loopProtect.timeout = 500;
+
   // expose debug info
   loopProtect.debug = function (state) {
     debug = state ? function () {
@@ -382,6 +384,18 @@ var loopProtect = (function () {
     return disableLoopProtection ? code : recompiled.join('\n');
   };
 
+  loopProtect.addTime = function(time) {
+    for (var counter in loopProtect.counters) {
+      loopProtect.counters[counter].expiration += (time + 10);
+    }
+  }
+
+  loopProtect.resetTime = function(time) {
+    for (var counter in loopProtect.counters) {
+      loopProtect.counters[counter].time = new Date();
+    }
+  }
+
   /**
    * Injected code in to user's code to **try** to protect against infinite
    * loops cropping up in the code, and killing the browser. Returns true
@@ -396,10 +410,13 @@ var loopProtect = (function () {
       line.time = now;
       line.hit = 0;
       line.last = 0;
+      line.expiration = loopProtect.timeout;
     }
 
     line.hit++;
-    if ((now - line.time) > 100) {//} && line.hit !== line.last+1) {
+    // console.log(state.line + ': ' + (now - line.time) + ' > ' + line.expiration);
+    // console.log(state.line + ': ' + line.hit);
+    if ((now - line.time) > line.expiration) {//} && line.hit !== line.last+1) {
       // We've spent over 100ms on this loop... smells infinite.
       var msg = 'Exiting potential infinite loop at line ' + state.line + '. To disable loop protection: add "// noprotect" to your code';
       if (window.proxyConsole) {
