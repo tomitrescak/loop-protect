@@ -410,7 +410,11 @@ var loopProtect = (function () {
       line.time = now;
       line.hit = 0;
       line.last = 0;
+<<<<<<< HEAD
       line.expiration = loopProtect.timeout;
+=======
+      line.expiration = 500;
+>>>>>>> 48df3d744ad87bd31b55e63accebf54e7c80fe9f
     }
 
     line.hit++;
